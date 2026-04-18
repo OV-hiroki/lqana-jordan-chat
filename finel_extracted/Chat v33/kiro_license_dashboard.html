@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiro Control — Master Panel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#080C14;--surface:#0E1420;--surface2:#141B28;--surface3:#1A2235;
+    --border:#1E2D42;--border2:#243348;
+    --accent:#E91E63;--accent2:#FF4081;--accentGlow:rgba(233,30,99,0.15);
+    --green:#00E676;--greenGlow:rgba(0,230,118,0.12);
+    --yellow:#FFB300;--yellowGlow:rgba(255,179,0,0.12);
+    --red:#FF3D00;--redGlow:rgba(255,61,0,0.12);
+    --blue:#2979FF;--blueGlow:rgba(41,121,255,0.12);
+    --text:#E8EDF5;--text2:#8A95A8;--text3:#4A5568;
+    --radius:12px;--radius2:8px;
+  }
+  body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:220px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;right:0;z-index:100;}
+  .main{margin-right:220px;flex:1;padding:28px;min-height:100vh;}
+  .logo{padding:24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+  .logo-icon{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .logo-text{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;}
+  .logo-sub{font-size:10px;color:var(--accent);font-weight:600;letter-spacing:1px;}
+  .nav{padding:16px 12px;flex:1;}
+  .nav-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:1.5px;padding:0 8px;margin-bottom:8px;margin-top:16px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius2);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;margin-bottom:2px;transition:all .2s;position:relative;}
+  .nav-item:hover{background:var(--surface2);color:var(--text);}
+  .nav-item.active{background:var(--accentGlow);color:var(--accent);border:1px solid rgba(233,30,99,0.2);}
+  .nav-item .icon{font-size:16px;width:20px;text-align:center;}
+  .nav-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;margin-right:auto;}
+  .sidebar-footer{padding:16px;border-top:1px solid var(--border);}
+  .admin-badge{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius2);border:1px solid var(--border);}
+  .admin-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;}
+  .admin-info{font-size:12px;font-weight:600;color:var(--text);}
+  .admin-role{font-size:10px;color:var(--accent);font-weight:700;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+  .page-title{font-size:22px;font-weight:700;color:var(--text);}
+  .page-sub{font-size:13px;color:var(--text2);margin-top:3px;}
+  .topbar-actions{display:flex;gap:10px;align-items:center;}
+  .btn{padding:9px 18px;border-radius:var(--radius2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:7px;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--surface2);color:var(--text);}
+  .btn-danger{background:var(--redGlow);color:var(--red);border:1px solid rgba(255,61,0,0.2);}
+  .btn-success{background:var(--greenGlow);color:var(--green);border:1px solid rgba(0,230,118,0.2);}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+  .stat-card.green::before{background:var(--green);}
+  .stat-card.red::before{background:var(--red);}
+  .stat-card.yellow::before{background:var(--yellow);}
+  .stat-card.blue::before{background:var(--blue);}
+  .stat-icon{font-size:24px;margin-bottom:12px;}
+  .stat-num{font-size:32px;font-weight:800;color:var(--text);line-height:1;}
+  .stat-label{font-size:12px;color:var(--text2);margin-top:6px;font-weight:500;}
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+  .section-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .section-title{font-size:15px;font-weight:700;color:var(--text);}
+  .table{width:100%;border-collapse:collapse;}
+  .table th{padding:12px 22px;text-align:right;font-size:11px;color:var(--text3);font-weight:700;letter-spacing:0.5px;border-bottom:1px solid var(--border);background:var(--surface2);}
+  .table td{padding:16px 22px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .table tr:last-child td{border-bottom:none;}
+  .table tr:hover td{background:var(--surface2);}
+  .client-name{font-weight:700;color:var(--text);font-size:14px;}
+  .client-owner{font-size:12px;color:var(--text2);margin-top:2px;}
+  .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+  .badge-active{background:var(--greenGlow);color:var(--green);border:1px solid rgba(0,230,118,0.2);}
+  .badge-locked{background:var(--redGlow);color:var(--red);border:1px solid rgba(255,61,0,0.2);}
+  .badge-overdue{background:var(--yellowGlow);color:var(--yellow);border:1px solid rgba(255,179,0,0.2);}
+  .badge-paid{background:var(--greenGlow);color:var(--green);border:1px solid rgba(0,230,118,0.2);}
+  .toggle-wrap{display:flex;align-items:center;gap:10px;}
+  .toggle{position:relative;display:inline-block;width:44px;height:24px;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;cursor:pointer;inset:0;background:var(--surface3);border-radius:24px;transition:.3s;border:1px solid var(--border2);}
+  .slider:before{content:'';position:absolute;width:18px;height:18px;right:3px;top:2px;background:var(--text3);border-radius:50%;transition:.3s;}
+  input:checked+.slider{background:var(--redGlow);border-color:rgba(255,61,0,0.4);}
+  input:checked+.slider:before{background:var(--red);transform:translateX(-20px);box-shadow:0 0 8px var(--red);}
+  .toggle-label{font-size:12px;color:var(--text2);}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:500px;max-height:85vh;overflow-y:auto;transform:translateY(20px);transition:transform .25s;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-size:17px;font-weight:700;}
+  .modal-close{width:32px;height:32px;border-radius:8px;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+  .modal-body{padding:28px;}
+  .modal-footer{padding:20px 28px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+  .form-group{margin-bottom:18px;}
+  .form-label{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;display:block;letter-spacing:0.3px;}
+  .form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:11px 14px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .2s;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-input::placeholder{color:var(--text3);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .actions{display:flex;gap:6px;align-items:center;}
+  .action-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;}
+  .action-btn:hover{background:var(--surface2);color:var(--text);}
+  .action-btn.danger:hover{background:var(--redGlow);color:var(--red);border-color:rgba(255,61,0,0.3);}
+  .stats-mini{display:flex;gap:8px;}
+  .stat-mini{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;text-align:center;}
+  .stat-mini-num{font-size:15px;font-weight:800;color:var(--text);}
+  .stat-mini-lbl{font-size:9px;color:var(--text3);font-weight:600;}
+  .page{display:none;}.page.active{display:block;}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius2);padding:12px 22px;font-size:13px;font-weight:600;color:var(--text);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;display:flex;align-items:center;gap:8px;}
+  .toast.show{opacity:1;}
+  .lock-preview{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-top:10px;text-align:center;}
+  ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+  /* LOGIN */
+  .login-screen{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;align-items:center;justify-content:center;}
+  .login-screen.hidden{display:none;}
+  .login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:400px;text-align:center;}
+  .login-box .logo-icon{width:60px;height:60px;border-radius:16px;font-size:28px;margin:0 auto 16px;}
+  .login-box h1{font-size:20px;font-weight:800;margin-bottom:4px;}
+  .login-box p{font-size:13px;color:var(--text2);margin-bottom:28px;}
+  .login-box .form-input{margin-bottom:14px;text-align:right;}
+  .login-error{color:var(--red);font-size:12px;margin-bottom:12px;min-height:18px;}
+  .loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .firebase-status{position:fixed;bottom:12px;right:12px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);z-index:50;}
+  .firebase-dot{width:6px;height:6px;border-radius:50%;}
+  .payment-info{display:flex;flex-direction:column;gap:4px;}
+  .payment-date{font-size:13px;font-weight:600;color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="logo-icon">🎙️</div>
+    <h1>Kiro Control</h1>
+    <p>لوحة التحكم الرئيسية — سجّل دخولك</p>
+    <input class="form-input" id="login-email" placeholder="البريد الإلكتروني" value="">
+    <input class="form-input" id="login-pass" type="password" placeholder="كلمة المرور">
+    <div class="login-error" id="login-error"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;height:46px;font-size:15px;" onclick="handleLogin()" id="login-btn">تسجيل الدخول</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app-container" style="display:none;">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🎙️</div>
+      <div><div class="logo-text">Kiro Control</div><div class="logo-sub">MASTER PANEL</div></div>
+    </div>
+    <div class="nav">
+      <div class="nav-label">الرئيسية</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span>لوحة التحكم</div>
+      <div class="nav-item" onclick="showPage('clients',this)"><span class="icon">📱</span>العملاء</div>
+      <div class="nav-label">الإدارة</div>
+      <div class="nav-item" onclick="showPage('payments',this)"><span class="icon">💳</span>المدفوعات</div>
+      <div class="nav-label">النظام</div>
+      <div class="nav-item" onclick="showPage('killswitch',this)"><span class="icon">🛡️</span>الكيلو سويتش</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="admin-badge">
+        <div class="admin-dot"></div>
+        <div><div class="admin-info" id="admin-name">المالك</div><div class="admin-role">OWNER & ADMIN</div></div>
+      </div>
+      <button class="btn btn-ghost" style="width:100%;margin-top:10px;justify-content:center;" onclick="handleLogout()">🚪 تسجيل خروج</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div><div class="page-title">لوحة التحكم الرئيسية</div><div class="page-sub">بيانات حية من Firebase 🔥</div></div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" onclick="loadAllData()">🔄 تحديث</button>
+          <button class="btn btn-primary" onclick="openModal('modal-new')">⚡ عميل جديد</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">📱</div><div class="stat-num" id="stat-active">—</div><div class="stat-label">التطبيق يعمل</div></div>
+        <div class="stat-card red"><div class="stat-icon">🔒</div><div class="stat-num" id="stat-locked">—</div><div class="stat-label">التطبيق مقفول</div></div>
+        <div class="stat-card blue"><div class="stat-icon">👥</div><div class="stat-num" id="stat-users">—</div><div class="stat-label">إجمالي المستخدمين</div></div>
+        <div class="stat-card yellow"><div class="stat-icon">🎙️</div><div class="stat-num" id="stat-rooms">—</div><div class="stat-label">الغرف النشطة</div></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div><div class="section-title">⚡ التحكم السريع — Kill-Switch</div></div></div>
+        <div style="padding:22px;" id="quick-ks"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">العملاء</div></div>
+        <table class="table"><thead><tr><th>العميل</th><th>الحالة</th><th>الدفع القادم</th><th>إجراءات</th></tr></thead><tbody id="dashboard-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CLIENTS PAGE -->
+    <div class="page" id="page-clients">
+      <div class="topbar">
+        <div><div class="page-title">إدارة العملاء</div><div class="page-sub">كل نسخ التطبيق</div></div>
+        <div class="topbar-actions"><button class="btn btn-primary" onclick="openModal('modal-new')">⚡ عميل جديد</button></div>
+      </div>
+      <div class="section">
+        <table class="table"><thead><tr><th>العميل</th><th>النوع</th><th>الحالة</th><th>السعر</th><th>الدفع القادم</th><th>إجراءات</th></tr></thead><tbody id="clients-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- PAYMENTS PAGE -->
+    <div class="page" id="page-payments">
+      <div class="topbar"><div><div class="page-title">إدارة المدفوعات</div><div class="page-sub">تابع الإيجارات والتجديدات</div></div></div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">جدول المدفوعات</div></div>
+        <table class="table"><thead><tr><th>العميل</th><th>المبلغ/شهر</th><th>آخر دفعة</th><th>الدفعة القادمة</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="payments-table"></tbody></table>
+      </div>
+    </div>
+
+    <!-- KILLSWITCH PAGE -->
+    <div class="page" id="page-killswitch">
+      <div class="topbar"><div><div class="page-title">🛡️ الكيلو سويتش المركزي</div><div class="page-sub">تحكم حقيقي — يقفل التطبيق فوراً عند كل المستخدمين</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="section">
+          <div class="section-header"><div class="section-title">🔒 حالة التطبيق الحالية (من Firebase)</div></div>
+          <div style="padding:24px;" id="ks-status">جاري التحميل...</div>
+        </div>
+        <div class="section">
+          <div class="section-header"><div class="section-title">⚡ تغيير الحالة</div></div>
+          <div style="padding:24px;">
+            <div class="form-group">
+              <label class="form-label">رسالة القفل (تظهر لكل المستخدمين)</label>
+              <textarea class="form-input" rows="3" id="ks-message" placeholder="التطبيق محجوب مؤقتاً للصيانة. سنعود قريباً."></textarea>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="setKillSwitch(true)">🔒 قفل التطبيق</button>
+              <button class="btn btn-success" style="flex:1;justify-content:center;" onclick="setKillSwitch(false)">🔓 فتح التطبيق</button>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:16px;font-size:12px;color:var(--text3);line-height:1.8;">
+              ⚠️ لما تقفل التطبيق، <strong style="color:var(--red)">كل المستخدمين</strong> هيشوفوا شاشة القفل فوراً<br>
+              📡 Firebase path: <code style="color:var(--accent)">app_status/global_config</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW CLIENT MODAL -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">⚡ إضافة عميل جديد</div><button class="modal-close" onclick="closeModal('modal-new')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">اسم العميل</label><input class="form-input" id="m-owner" placeholder="محمد علي"></div>
+        <div class="form-group"><label class="form-label">اسم التطبيق</label><input class="form-input" id="m-appname" placeholder="Amman Voices"></div>
+      </div>
+      <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input class="form-input" id="m-email" placeholder="client@email.com"></div>
+      <div class="form-group"><label class="form-label">رقم الواتساب</label><input class="form-input" id="m-phone" placeholder="+962..."></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">السعر الشهري ($)</label><input class="form-input" id="m-price" value="50"></div>
+        <div class="form-group"><label class="form-label">تاريخ الدفع القادم</label><input class="form-input" type="date" id="m-paydate"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new')">إلغاء</button>
+      <button class="btn btn-primary" onclick="addClient()">✅ إضافة العميل</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCK MODAL -->
+<div class="modal-overlay" id="modal-lock">
+  <div class="modal" style="width:480px">
+    <div class="modal-header"><div class="modal-title" id="lock-modal-title">🔒 قفل التطبيق</div><button class="modal-close" onclick="closeModal('modal-lock')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">رسالة ستظهر لكل المستخدمين</label>
+        <textarea class="form-input" rows="3" id="lock-message-input" placeholder="عزيزي المستخدم، التطبيق محجوب مؤقتاً..."></textarea>
+      </div>
+      <div class="lock-preview">
+        <div style="font-size:32px;margin-bottom:8px;">🔒</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">التطبيق غير متاح حالياً</div>
+        <div style="font-size:13px;color:var(--text2);font-style:italic;" id="lock-preview-text">رسالتك ستظهر هنا...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lock')">إلغاء</button>
+      <button class="btn" style="background:var(--red);color:#fff" onclick="confirmLock()">🔒 قفل الآن</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="firebase-status"><div class="firebase-dot" id="fb-dot" style="background:var(--yellow)"></div><span id="fb-status">جاري الاتصال...</span></div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyBM4rysHMNgs_Cd8EmPYCXI_Z5lOoZrpmI',
+  authDomain: 'jordan-audio-final.firebaseapp.com',
+  projectId: 'jordan-audio-final',
+  storageBucket: 'jordan-audio-final.firebasestorage.app',
+  messagingSenderId: '837211758188',
+  appId: '1:837211758188:web:12f9dfe96e03ca73738249',
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const ADMIN_UID = 'CdYNpTqftJd1INvAqli56y40OXk2';
+
+let clients = [];
+let currentLockClientId = null;
+let ksUnsubscribe = null;
+
+// ── AUTH ──────────────────────────────────────
+window.handleLogin = async function() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'أدخل البريد وكلمة المرور'; return; }
+  btn.innerHTML = '<span class="loading-spinner"></span>';
+  btn.disabled = true;
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    if (cred.user.uid !== ADMIN_UID) {
+      await signOut(auth);
+      errEl.textContent = '⛔ غير مصرح لك بالدخول — فقط المالك';
+      btn.innerHTML = 'تسجيل الدخول'; btn.disabled = false;
+      return;
+    }
+  } catch (e) {
+    const msgs = {'auth/invalid-credential':'البريد أو كلمة المرور غلط','auth/too-many-requests':'محاولات كثيرة، حاول بعدين'};
+    errEl.textContent = msgs[e.code] || e.message;
+    btn.innerHTML = 'تسجيل الدخول'; btn.disabled = false;
+  }
+};
+
+window.handleLogout = async function() {
+  if (ksUnsubscribe) ksUnsubscribe();
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user && user.uid === ADMIN_UID) {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-container').style.display = 'flex';
+    document.getElementById('admin-name').textContent = user.email.split('@')[0];
+    setFBStatus(true);
+    loadAllData();
+    listenToKillSwitch();
+  } else {
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('app-container').style.display = 'none';
+    document.getElementById('login-btn').innerHTML = 'تسجيل الدخول';
+    document.getElementById('login-btn').disabled = false;
+  }
+});
+
+// ── FIREBASE STATUS ──────────────────────────
+function setFBStatus(ok) {
+  document.getElementById('fb-dot').style.background = ok ? 'var(--green)' : 'var(--red)';
+  document.getElementById('fb-status').textContent = ok ? 'متصل بـ Firebase' : 'غير متصل';
+}
+
+// ── LOAD ALL DATA ────────────────────────────
+window.loadAllData = async function() {
+  try {
+    // Users count
+    const usersSnap = await getDocs(collection(db, 'users'));
+    document.getElementById('stat-users').textContent = usersSnap.size;
+    // Live rooms count
+    const roomsQ = query(collection(db, 'rooms'), where('isLive', '==', true));
+    const roomsSnap = await getDocs(roomsQ);
+    document.getElementById('stat-rooms').textContent = roomsSnap.size;
+    // Clients
+    const clientsSnap = await getDocs(collection(db, 'clients'));
+    clients = [];
+    clientsSnap.forEach(d => clients.push({ id: d.id, ...d.data() }));
+    // Kill-switch status
+    const ksSnap = await getDoc(doc(db, 'app_status', 'global_config'));
+    const ksData = ksSnap.exists() ? ksSnap.data() : {};
+    const isLocked = ksData.isLocked || false;
+    document.getElementById('stat-active').textContent = isLocked ? '0' : '1';
+    document.getElementById('stat-locked').textContent = isLocked ? '1' : '0';
+    renderAll();
+  } catch (e) {
+    console.error('Load error:', e);
+    showToast('❌ فشل تحميل البيانات: ' + e.message);
+  }
+};
+
+// ── KILL-SWITCH LISTENER ─────────────────────
+function listenToKillSwitch() {
+  const ref = doc(db, 'app_status', 'global_config');
+  ksUnsubscribe = onSnapshot(ref, (snap) => {
+    const data = snap.exists() ? snap.data() : {};
+    const locked = data.isLocked || false;
+    const msg = data.lockMessage || '';
+    // Update KS page
+    document.getElementById('ks-status').innerHTML = `
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:48px;margin-bottom:12px;">${locked ? '🔒' : '🟢'}</div>
+        <div style="font-size:20px;font-weight:800;color:${locked ? 'var(--red)' : 'var(--green)'};margin-bottom:8px;">
+          ${locked ? 'التطبيق مقفول ❌' : 'التطبيق يعمل ✅'}
+        </div>
+        ${msg ? `<div style="font-size:13px;color:var(--text2);margin-top:8px;font-style:italic;">"${msg}"</div>` : ''}
+        <div style="font-size:11px;color:var(--text3);margin-top:12px;">🔴 بيانات حية — Real-time من Firestore</div>
+      </div>`;
+    // Quick KS on dashboard
+    document.getElementById('quick-ks').innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:28px;">${locked ? '🔒' : '🟢'}</div>
+          <div>
+            <div style="font-weight:700;font-size:15px;color:${locked ? 'var(--red)' : 'var(--green)'}">${locked ? 'التطبيق مقفول' : 'التطبيق يعمل'}</div>
+            <div style="font-size:12px;color:var(--text3);">التحكم عبر Firebase — فوري</div>
+          </div>
+        </div>
+        <button class="btn ${locked ? 'btn-success' : 'btn-danger'}" onclick="setKillSwitch(${!locked})">
+          ${locked ? '🔓 فتح' : '🔒 قفل'}
+        </button>
+      </div>`;
+    document.getElementById('stat-active').textContent = locked ? '0' : '1';
+    document.getElementById('stat-locked').textContent = locked ? '1' : '0';
+  }, (err) => { console.error('KS listen error:', err); });
+}
+
+// ── SET KILL-SWITCH ──────────────────────────
+window.setKillSwitch = async function(lock) {
+  const msg = document.getElementById('ks-message')?.value || '';
+  try {
+    await updateDoc(doc(db, 'app_status', 'global_config'), {
+      isLocked: lock,
+      lockMessage: lock ? (msg || 'التطبيق محجوب مؤقتاً للصيانة.') : '',
+      updatedAt: serverTimestamp(),
+    });
+    showToast(lock ? '🔒 تم قفل التطبيق — كل المستخدمين شايفين شاشة القفل' : '🔓 تم فتح التطبيق — المستخدمين يقدروا يستخدموه');
+  } catch (e) {
+    showToast('❌ خطأ: ' + e.message);
+  }
+};
+
+// ── RENDER FUNCTIONS ─────────────────────────
+function renderAll() { renderDashboard(); renderClients(); renderPayments(); }
+
+function payBadge(s) {
+  if (s === 'paid') return '<span class="badge badge-paid">✅ مدفوع</span>';
+  if (s === 'overdue') return '<span class="badge badge-overdue">🚨 متأخر</span>';
+  return '<span class="badge badge-overdue" style="color:var(--yellow)">⏰ مستحق</span>';
+}
+
+function renderDashboard() {
+  document.getElementById('dashboard-table').innerHTML = clients.map(c => `
+    <tr>
+      <td><div class="client-name">${c.appName || '—'}</div><div class="client-owner">${c.owner || ''}</div></td>
+      <td>${payBadge(c.payStatus)}</td>
+      <td><div class="payment-date">${c.nextPay || '—'}</div><div style="font-size:11px;color:var(--text3)">$${c.price || 0}/شهر</div></td>
+      <td><div class="actions">
+        <button class="action-btn danger" onclick="deleteClient('${c.id}')" title="حذف">🗑️</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text3)">لا يوجد عملاء — أضف أول عميل</td></tr>';
+}
+
+function renderClients() {
+  document.getElementById('clients-table').innerHTML = clients.map(c => `
+    <tr>
+      <td><div class="client-name">${c.appName || '—'}</div><div class="client-owner">${c.owner} · ${c.email || ''}</div></td>
+      <td><span class="badge badge-active">${c.type === 'owned' ? '🏠 تمليك' : '📅 إيجار'}</span></td>
+      <td>${payBadge(c.payStatus)}</td>
+      <td style="font-weight:700;color:var(--green)">$${c.price || 0}</td>
+      <td>${c.nextPay || '—'}</td>
+      <td><div class="actions">
+        <button class="action-btn danger" onclick="deleteClient('${c.id}')" title="حذف">🗑️</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">لا يوجد عملاء</td></tr>';
+}
+
+function renderPayments() {
+  const rental = clients.filter(c => c.type !== 'owned');
+  document.getElementById('payments-table').innerHTML = rental.map(c => `
+    <tr>
+      <td><div class="client-name">${c.appName}</div><div class="client-owner">${c.owner}</div></td>
+      <td style="font-weight:800;color:var(--green)">$${c.price || 0}</td>
+      <td style="color:var(--text2)">${c.lastPay || '—'}</td>
+      <td style="font-weight:600">${c.nextPay || '—'}</td>
+      <td>${payBadge(c.payStatus)}</td>
+      <td><button class="btn btn-success" style="padding:6px 12px;font-size:12px" onclick="markPaid('${c.id}')">✅ دفع</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">لا يوجد مدفوعات</td></tr>';
+}
+
+// ── ADD CLIENT ───────────────────────────────
+window.addClient = async function() {
+  const data = {
+    owner: document.getElementById('m-owner').value || 'عميل جديد',
+    appName: document.getElementById('m-appname').value || 'تطبيق جديد',
+    email: document.getElementById('m-email').value || '',
+    phone: document.getElementById('m-phone').value || '',
+    type: 'rental',
+    price: parseInt(document.getElementById('m-price').value) || 50,
+    lastPay: new Date().toISOString().split('T')[0],
+    nextPay: document.getElementById('m-paydate').value || '',
+    payStatus: 'upcoming',
+    createdAt: serverTimestamp(),
+  };
+  try {
+    await addDoc(collection(db, 'clients'), data);
+    closeModal('modal-new');
+    showToast('✅ تم إضافة ' + data.appName);
+    await loadAllData();
+  } catch (e) { showToast('❌ خطأ: ' + e.message); }
+};
+
+// ── DELETE CLIENT ────────────────────────────
+window.deleteClient = async function(id) {
+  if (!confirm('هل أنت متأكد من حذف هذا العميل؟')) return;
+  try {
+    await deleteDoc(doc(db, 'clients', id));
+    showToast('🗑️ تم الحذف');
+    await loadAllData();
+  } catch (e) { showToast('❌ خطأ: ' + e.message); }
+};
+
+// ── MARK PAID ────────────────────────────────
+window.markPaid = async function(id) {
+  const now = new Date();
+  const next = new Date(now); next.setMonth(next.getMonth() + 1);
+  try {
+    await updateDoc(doc(db, 'clients', id), {
+      payStatus: 'paid',
+      lastPay: now.toISOString().split('T')[0],
+      nextPay: next.toISOString().split('T')[0],
+    });
+    showToast('✅ تم تسجيل الدفعة');
+    await loadAllData();
+  } catch (e) { showToast('❌ خطأ: ' + e.message); }
+};
+
+// ── UI HELPERS ───────────────────────────────
+window.showPage = function(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+};
+window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+window.showToast = function(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+};
+
+// Set default date
+const d = new Date(); d.setMonth(d.getMonth() + 1);
+const ds = d.toISOString().split('T')[0];
+document.getElementById('m-paydate').value = ds;
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// Lock message live preview
+document.getElementById('lock-message-input')?.addEventListener('input', function() {
+  document.getElementById('lock-preview-text').textContent = this.value || 'رسالتك ستظهر هنا...';
+});
+</script>
+</body>
+</html>

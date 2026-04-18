@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "837211758188",
+    "project_id": "jordan-audio-final",
+    "storage_bucket": "jordan-audio-final.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837211758188:android:d631e16b25279287738249",
+        "android_client_info": {
+          "package_name": "com.jordanaudioforumx.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARKNYSpoSVZB8789YxjxgValR9o5pRxks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyA0AFioWSUWi5qoBKw9sYKLEH1PRz4tUQs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>173387366364</string>
+	<key>PROJECT_ID</key>
+	<string>lqana-jordan-chat</string>
+	<key>STORAGE_BUCKET</key>
+	<string>lqana-jordan-chat.firebasestorage.app</string>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:173387366364:ios:e2c3b7f7a42764f38d9919</string>
+	<key>DATABASE_URL</key>
+	<string></string>
+	<key>BUNDLE_ID</key>
+	<string>com.jordanaudioforumx.lqanaJordonChat</string>
+</dict>
+</plist>

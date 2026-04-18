@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم المالك — Owner Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Cairo', Tahoma, sans-serif;
+      background: #f0f2f5;
+      color: #222;
+      direction: rtl;
+    }
+
+    /* ── Login Screen ── */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #BE5C7A 0%, #8B2252 100%);
+    }
+    .login-card {
+      background: #fff; border-radius: 20px; padding: 40px;
+      width: 360px; max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .login-card .logo {
+      text-align: center; margin-bottom: 28px;
+    }
+    .login-card .logo-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, #BE5C7A, #8B2252);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 32px;
+    }
+    .login-card h2 {
+      font-size: 22px; font-weight: 800; color: #222;
+      text-align: center; margin-bottom: 6px;
+    }
+    .login-card p { text-align: center; color: #888; font-size: 13px; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #555; margin-bottom: 6px;
+    }
+    .input-group input {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid #ddd; font-size: 14px;
+      transition: border-color 0.2s;
+      text-align: right;
+    }
+    .input-group input:focus { outline: none; border-color: #BE5C7A; }
+    .btn-primary {
+      width: 100%; padding: 14px; border-radius: 10px;
+      background: linear-gradient(135deg, #BE5C7A, #8B2252);
+      color: #fff; font-size: 15px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .error-msg {
+      color: #e53935; font-size: 13px; text-align: center;
+      margin-top: 10px; display: none;
+    }
+
+    /* ── Dashboard ── */
+    #dashboard { display: none; }
+    .sidebar {
+      position: fixed; top: 0; right: 0;
+      width: 240px; height: 100vh;
+      background: linear-gradient(180deg, #BE5C7A 0%, #8B2252 100%);
+      overflow-y: auto; z-index: 100;
+    }
+    .sidebar-header {
+      padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #fff;
+    }
+    .sidebar-logo-text h3 {
+      color: #fff; font-size: 16px; font-weight: 800;
+    }
+    .sidebar-logo-text p {
+      color: rgba(255,255,255,0.7); font-size: 11px;
+    }
+    .nav-section {
+      padding: 16px 12px 8px;
+      font-size: 11px; color: rgba(255,255,255,0.5);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; color: rgba(255,255,255,0.8);
+      cursor: pointer; border-radius: 10px; margin: 2px 8px;
+      font-size: 14px; font-weight: 600; transition: all 0.2s;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: rgba(255,255,255,0.15); color: #fff;
+    }
+    .nav-item .icon { font-size: 18px; }
+
+    .logout-btn {
+      margin: 16px; padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px; color: #fff; cursor: pointer;
+      font-size: 13px; font-weight: 600; text-align: center;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.2); }
+
+    .main {
+      margin-right: 240px; padding: 24px; min-height: 100vh;
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-title {
+      font-size: 22px; font-weight: 800; color: #222;
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 2px solid #BE5C7A;
+    }
+
+    /* ── Stats Cards ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 14px; padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .stat-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .stat-info h3 { font-size: 28px; font-weight: 800; color: #222; }
+    .stat-info p { font-size: 13px; color: #888; }
+
+    /* ── Table ── */
+    .card {
+      background: #fff; border-radius: 14px; padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-header h3 { font-size: 16px; font-weight: 700; color: #222; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 14px; text-align: right; font-size: 13px; }
+    th { background: #f8f9fa; font-weight: 700; color: #555; }
+    tr:not(:last-child) td { border-bottom: 1px solid #f0f0f0; }
+    tr:hover td { background: #fdf0f5; }
+
+    /* ── Countdown ── */
+    .countdown {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 700;
+    }
+    .countdown.active { background: #fff8e1; color: #f59e0b; }
+    .countdown.expired { background: #ffeaea; color: #e53935; }
+    .countdown.none { background: #f0f0f0; color: #999; }
+
+    /* ── Status badges ── */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge.live { background: #e8f5e9; color: #2e7d32; }
+    .badge.closed { background: #ffeaea; color: #c62828; }
+    .badge.rented { background: #fff8e1; color: #f59e0b; }
+
+    /* ── Buttons ── */
+    .btn { 
+      padding: 6px 14px; border-radius: 8px; border: none;
+      cursor: pointer; font-size: 12px; font-weight: 700;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-danger { background: #ffeaea; color: #e53935; }
+    .btn-success { background: #e8f5e9; color: #2e7d32; }
+    .btn-primary-sm { background: #BE5C7A; color: #fff; }
+    .btn-info { background: #e3f2fd; color: #1565c0; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 999;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; border-radius: 16px; padding: 28px;
+      width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+    }
+    .modal h3 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 12px; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 14px; text-align: right;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none; border-color: #BE5C7A;
+    }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+    #support-messages {
+      max-height: 380px; overflow-y: auto; padding: 12px; background: #f5f5f5;
+      border-radius: 10px; display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 12px; text-align: right;
+    }
+    .support-bubble {
+      padding: 10px 14px; border-radius: 12px; max-width: 92%; font-size: 13px; line-height: 1.4;
+    }
+    .support-bubble.admin { background: #fde8ee; align-self: flex-end; border: 1px solid #f8bbd0; }
+    .support-bubble.user { background: #fff; align-self: flex-start; border: 1px solid #e0e0e0; }
+    .support-bubble .who { font-size: 11px; color: #888; margin-bottom: 4px; font-weight: 700; }
+
+    /* ── Kill switch ── */
+    .kill-switch-card {
+      background: #fff; border-radius: 14px; padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 2px solid transparent; transition: border-color 0.3s;
+    }
+    .kill-switch-card.locked { border-color: #e53935; }
+    .switch-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .switch-row h3 { font-size: 18px; font-weight: 700; }
+    .toggle {
+      width: 56px; height: 30px; border-radius: 15px;
+      background: #ddd; cursor: pointer; position: relative;
+      transition: background 0.3s;
+    }
+    .toggle.on { background: #e53935; }
+    .toggle::after {
+      content: ''; position: absolute; top: 3px; right: 3px;
+      width: 24px; height: 24px; border-radius: 50%; background: #fff;
+      transition: transform 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .toggle.on::after { transform: translateX(-26px); }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 40px; color: #999; }
+    .spinner {
+      width: 36px; height: 36px; border: 3px solid #f0f0f0;
+      border-top-color: #BE5C7A; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; }
+      .sidebar-header .sidebar-logo-text,
+      .sidebar-header .sidebar-logo-icon + *,
+      .nav-item span:last-child,
+      .nav-section,
+      .logout-btn { display: none; }
+      .main { margin-right: 60px; padding: 16px; }
+      .nav-item { justify-content: center; margin: 2px 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════ LOGIN ══════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">
+      <div class="logo-icon">🎙️</div>
+      <h2>Owner Dashboard</h2>
+      <p>لوحة تحكم المالك</p>
+    </div>
+    <div class="input-group">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="login-email" placeholder="owner@example.com" />
+    </div>
+    <div class="input-group">
+      <label>كلمة المرور</label>
+      <input type="password" id="login-pass" placeholder="••••••••" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">دخول</button>
+    <p class="error-msg" id="login-error">بيانات غير صحيحة</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════ DASHBOARD ══════════════════════ -->
+<div id="dashboard">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🎙️</div>
+        <div class="sidebar-logo-text">
+          <h3>Owner Panel</h3>
+          <p>لوحة المالك</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section">الرئيسية</div>
+    <div class="nav-item active" onclick="showPage('overview')">
+      <span class="icon">📊</span><span>نظرة عامة</span>
+    </div>
+
+    <div class="nav-section">الغرف</div>
+    <div class="nav-item" onclick="showPage('rooms')">
+      <span class="icon">🏠</span><span>جميع الغرف</span>
+    </div>
+    <div class="nav-item" onclick="showPage('rentals')">
+      <span class="icon">⏱️</span><span>الإيجارات</span>
+    </div>
+
+    <div class="nav-section">المستخدمون</div>
+    <div class="nav-item" onclick="showPage('users')">
+      <span class="icon">👥</span><span>المستخدمون</span>
+    </div>
+    <div class="nav-item" onclick="showPage('support')">
+      <span class="icon">💬</span><span>الدعم الفني</span>
+    </div>
+
+    <div class="nav-section">النظام</div>
+    <div class="nav-item" onclick="showPage('settings')">
+      <span class="icon">⚙️</span><span>الإعدادات</span>
+    </div>
+
+    <div class="logout-btn" onclick="doLogout()">🚪 تسجيل خروج</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- Overview -->
+    <div id="page-overview" class="page active">
+      <div class="page-title">📊 نظرة عامة</div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fde8ee">🏠</div>
+          <div class="stat-info">
+            <h3 id="stat-rooms">—</h3><p>إجمالي الغرف</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e8f5e9">🔴</div>
+          <div class="stat-info">
+            <h3 id="stat-live">—</h3><p>غرف مباشرة</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fff8e1">🔑</div>
+          <div class="stat-info">
+            <h3 id="stat-rented">—</h3><p>غرف مؤجرة</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e3f2fd">👤</div>
+          <div class="stat-info">
+            <h3 id="stat-users">—</h3><p>المستخدمون</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>⏰ الإيجارات المنتهية قريباً (أقل من 24 ساعة)</h3>
+        </div>
+        <div id="expiring-soon">
+          <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rooms -->
+    <div id="page-rooms" class="page">
+      <div class="page-title">🏠 جميع الغرف</div>
+      <div class="card">
+        <div class="card-header">
+          <h3>الغرف</h3>
+          <span style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-primary-sm" onclick="openCreateRoomModal()">➕ غرفة جديدة</button>
+            <button type="button" class="btn btn-primary-sm" onclick="loadRooms()">🔄 تحديث</button>
+          </span>
+        </div>
+        <div id="rooms-table">
+          <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rentals -->
+    <div id="page-rentals" class="page">
+      <div class="page-title">⏱️ إدارة الإيجارات</div>
+      <div class="card">
+        <div class="card-header">
+          <h3>الغرف المؤجرة</h3>
+          <button class="btn btn-primary-sm" onclick="loadRentals()">🔄 تحديث</button>
+        </div>
+        <div id="rentals-table">
+          <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div id="page-users" class="page">
+      <div class="page-title">👥 المستخدمون</div>
+      <div class="card">
+        <div class="card-header">
+          <h3>البحث عن مستخدم</h3>
+        </div>
+        <input type="text" id="user-search" placeholder="ابحث بالاسم أو البريد..."
+          style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:14px;text-align:right"
+          oninput="searchUsers(this.value)" />
+        <div id="users-table">
+          <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Support -->
+    <div id="page-support" class="page">
+      <div class="page-title">💬 رسائل الدعم الفني</div>
+      <div class="card">
+        <div id="support-list">
+          <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="page-settings" class="page">
+      <div class="page-title">⚙️ إعدادات التطبيق</div>
+
+      <div class="kill-switch-card" id="kill-switch-card">
+        <div class="switch-row">
+          <div>
+            <h3 id="lock-status-title">حالة التطبيق: جاري التحميل...</h3>
+            <p style="color:#888;font-size:13px;margin-top:4px">
+              إيقاف التطبيق يمنع جميع المستخدمين من الدخول
+            </p>
+          </div>
+          <div class="toggle" id="lock-toggle" onclick="toggleLock()"></div>
+        </div>
+        <div class="form-group">
+          <label>رسالة الحجب (تظهر للمستخدمين)</label>
+          <textarea id="lock-message" rows="3"
+            placeholder="التطبيق محجوب مؤقتاً للصيانة..."></textarea>
+        </div>
+        <button class="btn btn-primary-sm" onclick="saveLockSettings()" style="padding:10px 20px">
+          💾 حفظ الإعدادات
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════ RENTAL MODAL ══════════════════ -->
+<div class="modal-overlay" id="rental-modal">
+  <div class="modal">
+    <h3 id="rental-modal-title">إدارة إيجار الغرفة</h3>
+    <input type="hidden" id="rental-room-id" />
+
+    <div class="form-group">
+      <label>اسم المستأجر (صاحب الغرفة)</label>
+      <input type="text" id="rental-renter-name" placeholder="اسم المستأجر" />
+    </div>
+    <div class="form-group">
+      <label>ربط المستأجر بحساب (اختياري)</label>
+      <select id="rental-renter-uid"></select>
+      <p style="font-size:11px;color:#888;margin-top:4px">يُحفظ في Firestore كـ renterUid لربط صلاحيات صاحب الإيجار</p>
+    </div>
+    <div class="form-group">
+      <label>أدمن الغرفة — من يدير الجلسة (اختياري)</label>
+      <select id="rental-designated-admin-uid"></select>
+      <p style="font-size:11px;color:#888;margin-top:4px">يُعيَّن من يدفع الإيجار؛ يدخل هذا المستخدم برتبة أدمن تلقائياً</p>
+    </div>
+    <div class="form-group">
+      <label>تاريخ ووقت البداية</label>
+      <input type="datetime-local" id="rental-start" />
+    </div>
+    <div class="form-group">
+      <label>تاريخ ووقت الانتهاء</label>
+      <input type="datetime-local" id="rental-end" oninput="updateRentalPreview()" />
+    </div>
+    <div id="rental-preview" style="display:none;padding:10px;background:#fff8e1;border-radius:8px;font-size:13px;color:#f59e0b;font-weight:700;margin-bottom:10px">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="clear-rental-btn" onclick="clearRental()">🗑️ إلغاء الإيجار</button>
+      <button class="btn" onclick="closeRentalModal()" style="background:#f0f0f0;color:#555">إلغاء</button>
+      <button class="btn btn-primary-sm" onclick="saveRental()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════ CREATE / EDIT ROOM ═══════════════════════ -->
+<div class="modal-overlay" id="create-room-modal">
+  <div class="modal">
+    <h3>إنشاء غرفة جديدة</h3>
+    <div class="form-group">
+      <label>عنوان الغرفة</label>
+      <input type="text" id="new-room-title" placeholder="اسم الغرفة" />
+    </div>
+    <div class="form-group">
+      <label>الوصف (اختياري)</label>
+      <textarea id="new-room-desc" rows="2" placeholder="وصف قصير"></textarea>
+    </div>
+    <div class="form-group">
+      <label>التصنيف</label>
+      <select id="new-room-cat">
+        <option value="technology">💻 التكنولوجيا</option>
+        <option value="business">💼 الأعمال</option>
+        <option value="music">🎵 الموسيقى</option>
+        <option value="sports">⚽ الرياضة</option>
+        <option value="education">📚 التعليم</option>
+        <option value="entertainment">🎭 الترفيه</option>
+        <option value="news">📰 الأخبار</option>
+        <option value="other" selected>💬 أخرى</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>السعة القصوى</label>
+      <input type="number" id="new-room-cap" value="50" min="2" max="500" />
+    </div>
+    <div class="form-group">
+      <label>صورة الغرفة (رفع من الجهاز)</label>
+      <input type="file" id="new-room-cover" accept="image/*" />
+      <p id="new-room-cover-hint" style="font-size:12px;color:#666;margin-top:6px"></p>
+    </div>
+    <div class="form-group">
+      <label>أدمن الغرفة (اختياري)</label>
+      <select id="new-room-designated-admin"></select>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn" onclick="closeCreateRoomModal()" style="background:#f0f0f0;color:#555">إلغاء</button>
+      <button type="button" class="btn btn-primary-sm" onclick="saveNewRoom()">💾 إنشاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-room-modal">
+  <div class="modal">
+    <h3>تعديل الغرفة</h3>
+    <input type="hidden" id="edit-room-id" />
+    <div class="form-group">
+      <label>عنوان الغرفة</label>
+      <input type="text" id="edit-room-title" />
+    </div>
+    <div class="form-group">
+      <label>الوصف</label>
+      <textarea id="edit-room-desc" rows="2"></textarea>
+    </div>
+    <div class="form-group">
+      <label>التصنيف</label>
+      <select id="edit-room-cat"></select>
+    </div>
+    <div class="form-group">
+      <label>السعة القصوى</label>
+      <input type="number" id="edit-room-cap" min="2" max="500" />
+    </div>
+    <div class="form-group">
+      <label>صورة الغرفة (رفع جديدة أو اترك فارغاً للإبقاء)</label>
+      <input type="file" id="edit-room-cover" accept="image/*" />
+      <p id="edit-room-cover-hint" style="font-size:12px;color:#666;margin-top:6px"></p>
+    </div>
+    <div class="form-group">
+      <label>أدمن الغرفة</label>
+      <select id="edit-room-designated-admin"></select>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn" onclick="closeEditRoomModal()" style="background:#f0f0f0;color:#555">إلغاء</button>
+      <button type="button" class="btn btn-primary-sm" onclick="saveEditRoom()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="support-conv-modal">
+  <div class="modal" style="width:520px;max-width:96vw">
+    <h3 id="support-conv-title">محادثة الدعم</h3>
+    <div id="support-messages"></div>
+    <div class="form-group" style="display:flex;gap:8px;align-items:flex-end">
+      <textarea id="support-reply-input" rows="2" placeholder="اكتب ردك للمستخدم..." style="flex:1"></textarea>
+      <button type="button" class="btn btn-primary-sm" onclick="sendSupportReplyWeb()">إرسال</button>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn" onclick="closeSupportConvModal()" style="background:#f0f0f0;color:#555">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+  import {
+    getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+  import {
+    getFirestore, collection, getDocs, doc, updateDoc, onSnapshot,
+    query, orderBy, Timestamp, serverTimestamp, addDoc, limit, deleteDoc,
+  } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+  // ── Firebase Config ────────────────────────────────────────
+  // ⚠️ استبدل هذه القيم بقيم مشروعك من Firebase Console
+  const firebaseConfig = {
+    apiKey:            "AIzaSyARKNYSpoSVZB8789YxjxgValR9o5pRxks",
+    authDomain:        "jordan-audio-final.firebaseapp.com",
+    projectId:         "jordan-audio-final",
+    storageBucket:     "jordan-audio-final.firebasestorage.app",
+    messagingSenderId: "837211758188",
+    appId:             "1:837211758188:android:d631e16b25279287738249"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  /** مطابق لإعدادات التطبيق — رفع بدون Firebase Storage (يتجاوز مشاكل القواعد والبطء) */
+  const CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/dx262huam/image/upload";
+  const CLOUDINARY_PRESET = "jordan-audio-forum";
+  const CLOUDINARY_FOLDER = "jordan_audio/room_images";
+
+  // ── Admin UIDs (change to your owner UID) ──────────────────
+  const OWNER_UIDS = [
+    "CdYNpTqftJd1INvAqli56y40OXk2",
+  ];
+
+  const ROOM_CAT_OPTIONS = [
+    ["technology", "💻 التكنولوجيا"], ["business", "💼 الأعمال"], ["music", "🎵 الموسيقى"],
+    ["sports", "⚽ الرياضة"], ["education", "📚 التعليم"], ["entertainment", "🎭 الترفيه"],
+    ["news", "📰 الأخبار"], ["other", "💬 أخرى"],
+  ];
+
+  const ICON_FOR_CAT = Object.fromEntries([
+    ["technology","💻"],["business","💼"],["music","🎵"],["sports","⚽"],
+    ["education","📚"],["entertainment","🎭"],["news","📰"],["other","💬"],
+  ]);
+
+  const defaultRoomSettings = () => ({
+    welcomeMessage: '',
+    whoCanSpeak: 'all',
+    speakDuration: { guest: 350, member: 350, admin: 350, superadmin: 350, master: 350 },
+    cameraEnabled: false,
+    lockStatus: 'open',
+    lockReason: '',
+    hasGateway: false,
+    allowImages: true,
+    allowMasterAddMaster: true,
+    allowMasterChangeSettings: false,
+  });
+
+  let supportMessagesUnsub = null;
+
+  async function compressImageForUpload(file, maxW = 1280, maxH = 1280, jpegQuality = 0.82) {
+    if (!file.type.startsWith("image/")) return file;
+    try {
+      const bmp = await createImageBitmap(file);
+      let w = bmp.width, h = bmp.height;
+      const scale = Math.min(maxW / w, maxH / h, 1);
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(bmp, 0, 0, w, h);
+      bmp.close();
+      const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", jpegQuality));
+      if (blob) return blob;
+    } catch (e) { console.warn("compress skip:", e); }
+    return file;
+  }
+
+  async function uploadRoomCoverImage(file) {
+    if (!file || !file.size) return null;
+    const small = file.size > 350000 ? await compressImageForUpload(file) : file;
+    const fd = new FormData();
+    fd.append("file", small, String(file.name || "cover.jpg").replace(/[^\w.\-]/g, "_"));
+    fd.append("upload_preset", CLOUDINARY_PRESET);
+    fd.append("folder", CLOUDINARY_FOLDER);
+    const res = await fetch(CLOUDINARY_UPLOAD_URL, { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok || !data.secure_url) {
+      throw new Error(data.error?.message || data.error || "فشل رفع الصورة");
+    }
+    return data.secure_url;
+  }
+
+  function fillUserSelectOptions(selectEl, selectedUid) {
+    if (!selectEl) return;
+    const users = window._users || [];
+    let html = `<option value="">— بدون —</option>`;
+    users.forEach((u) => {
+      const id = u.id;
+      const label = `${u.displayName || "—"} · ${u.email || ""}`;
+      html += `<option value="${id}">${escapeHtml(label)}</option>`;
+    });
+    selectEl.innerHTML = html;
+    if (selectedUid) selectEl.value = selectedUid;
+  }
+
+  // ── State ──────────────────────────────────────────────────
+  window._rooms = [];
+  window._users = [];
+  window._db    = db;
+  window._auth  = auth;
+
+  // ── Auth ───────────────────────────────────────────────────
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("dashboard").style.display    = "block";
+      loadAll();
+    } else {
+      document.getElementById("login-screen").style.display = "flex";
+      document.getElementById("dashboard").style.display    = "none";
+    }
+  });
+
+  window.doLogin = async () => {
+    const email = document.getElementById("login-email").value.trim();
+    const pass  = document.getElementById("login-pass").value;
+    const errEl = document.getElementById("login-error");
+    errEl.style.display = "none";
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+      errEl.textContent = "البريد أو كلمة المرور غير صحيحة";
+      errEl.style.display = "block";
+    }
+  };
+
+  window.doLogout = async () => {
+    await signOut(auth);
+  };
+
+  // ── Load All ───────────────────────────────────────────────
+  async function loadAll() {
+    await loadRooms();
+    await loadUsers();
+    loadSupport();
+    loadKillSwitch();
+  }
+  window.loadAll = loadAll;
+
+  // ── Load Rooms ─────────────────────────────────────────────
+  window.loadRooms = async () => {
+    try {
+      let snap;
+      try {
+        snap = await getDocs(query(collection(db, "rooms"), orderBy("createdAt", "desc")));
+      } catch (e1) {
+        console.warn("rooms orderBy createdAt:", e1);
+        snap = await getDocs(collection(db, "rooms"));
+      }
+      window._rooms = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      window._rooms.sort((a, b) => {
+        const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return tb - ta;
+      });
+      renderRooms();
+      renderRentals();
+      renderOverview();
+      renderExpiringSoon();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  function renderRooms() {
+    const rooms = window._rooms;
+    if (!rooms.length) {
+      document.getElementById("rooms-table").innerHTML = "<p style='text-align:center;color:#888;padding:20px'>لا توجد غرف</p>";
+      return;
+    }
+    let html = `<table>
+      <tr><th>الغرفة</th><th>الحالة</th><th>المستمعون</th><th>الإيجار</th><th>إجراءات</th></tr>`;
+    rooms.forEach(r => {
+      const liveNow = r.isLive !== false;
+      const isLive   = liveNow ? '<span class="badge live">مباشر</span>' : '<span class="badge closed">مغلق</span>';
+      const isRented = r.rentalExpiresAt ? '<span class="badge rented">مؤجرة</span>' : '—';
+      const count    = (r.speakersCount || 0) + (r.listenersCount || 0);
+      html += `<tr>
+        <td><b>${escapeHtml(r.title || '—')}</b><br><small style="color:#888">${escapeHtml(r.hostName || '')}</small></td>
+        <td>${isLive}</td>
+        <td>${count}</td>
+        <td>${isRented}</td>
+        <td style="white-space:normal;max-width:220px">
+          <button type="button" class="btn ${liveNow ? 'btn-danger' : 'btn-success'}" onclick="toggleRoom('${r.id}', ${liveNow})">
+            ${liveNow ? '🔒 إغلاق' : '🔓 فتح'}
+          </button>
+          <button type="button" class="btn btn-info" onclick="openRentalModal('${r.id}')">⏱️ إيجار</button>
+          <button type="button" class="btn btn-primary-sm" onclick="openEditRoomModal('${r.id}')">✏️ تعديل</button>
+          <button type="button" class="btn btn-danger" onclick="deleteRoom('${r.id}')">🗑️ حذف</button>
+        </td>
+      </tr>`;
+    });
+    html += "</table>";
+    document.getElementById("rooms-table").innerHTML = html;
+  }
+
+  function renderRentals() {
+    const rented = window._rooms.filter(r => r.rentalExpiresAt);
+    if (!rented.length) {
+      document.getElementById("rentals-table").innerHTML = "<p style='text-align:center;color:#888;padding:20px'>لا توجد غرف مؤجرة حالياً</p>";
+      return;
+    }
+    let html = `<table>
+      <tr><th>الغرفة</th><th>المستأجر</th><th>بداية</th><th>نهاية</th><th>المتبقي</th><th>إجراءات</th></tr>`;
+    rented.forEach(r => {
+      const start   = r.rentalStartAt   ? toDateStr(r.rentalStartAt.toDate()) : '—';
+      const end     = r.rentalExpiresAt ? toDateStr(r.rentalExpiresAt.toDate()) : '—';
+      const left    = r.rentalExpiresAt ? formatDuration(r.rentalExpiresAt.toDate() - new Date()) : '—';
+      const expired = r.rentalExpiresAt && r.rentalExpiresAt.toDate() < new Date();
+      html += `<tr>
+        <td><b>${r.title || '—'}</b></td>
+        <td>${r.renterName || '—'}</td>
+        <td>${start}</td>
+        <td>${end}</td>
+        <td><span class="countdown ${expired ? 'expired' : 'active'}">⏱️ ${left}</span></td>
+        <td>
+          <button class="btn btn-info" onclick="openRentalModal('${r.id}')">✏️ تعديل</button>
+          &nbsp;
+          <button class="btn btn-danger" onclick="doClearRental('${r.id}')">🗑️ إلغاء</button>
+        </td>
+      </tr>`;
+    });
+    html += "</table>";
+    document.getElementById("rentals-table").innerHTML = html;
+  }
+
+  function renderOverview() {
+    const rooms = window._rooms;
+    document.getElementById("stat-rooms").textContent  = rooms.length;
+    document.getElementById("stat-live").textContent   = rooms.filter(r=>r.isLive !== false).length;
+    document.getElementById("stat-rented").textContent = rooms.filter(r=>r.rentalExpiresAt).length;
+    document.getElementById("stat-users").textContent  = window._users.length;
+  }
+
+  function renderExpiringSoon() {
+    const now   = new Date();
+    const in24h = new Date(now.getTime() + 24*60*60*1000);
+    const soon  = window._rooms.filter(r =>
+      r.rentalExpiresAt &&
+      r.rentalExpiresAt.toDate() > now &&
+      r.rentalExpiresAt.toDate() < in24h
+    );
+    if (!soon.length) {
+      document.getElementById("expiring-soon").innerHTML =
+        "<p style='color:#999;font-size:13px'>لا توجد إيجارات تنتهي خلال 24 ساعة ✅</p>";
+      return;
+    }
+    let html = `<table><tr><th>الغرفة</th><th>المستأجر</th><th>ينتهي في</th></tr>`;
+    soon.forEach(r => {
+      const left = formatDuration(r.rentalExpiresAt.toDate() - now);
+      html += `<tr>
+        <td><b>${r.title}</b></td>
+        <td>${r.renterName || '—'}</td>
+        <td><span class="countdown active">⏱️ ${left}</span></td>
+      </tr>`;
+    });
+    html += "</table>";
+    document.getElementById("expiring-soon").innerHTML = html;
+  }
+
+  // ── Room toggle ────────────────────────────────────────────
+  window.toggleRoom = async (id, isLive) => {
+    if (!confirm(isLive ? "هل تريد إغلاق هذه الغرفة؟" : "هل تريد فتح هذه الغرفة؟")) return;
+    await updateDoc(doc(db, "rooms", id), { isLive: !isLive });
+    await loadRooms();
+  };
+
+  window.deleteRoom = async (id) => {
+    if (!confirm("حذف الغرفة نهائياً من قاعدة البيانات؟ قد تبقى مجلدات فرعية (رسائل/سجل) — احذفها من Console عند الحاجة.")) return;
+    try {
+      await deleteDoc(doc(db, "rooms", id));
+      await loadRooms();
+    } catch (e) {
+      alert("تعذر الحذف: " + (e.message || e));
+    }
+  };
+
+  // ── Rental Modal ───────────────────────────────────────────
+  window.openRentalModal = (roomId) => {
+    const room = window._rooms.find(r => r.id === roomId);
+    if (!room) return;
+    document.getElementById("rental-room-id").value   = roomId;
+    document.getElementById("rental-modal-title").textContent = `إيجار: ${room.title}`;
+    document.getElementById("rental-renter-name").value = room.renterName || "";
+    fillUserSelectOptions(document.getElementById("rental-renter-uid"), room.renterUid || "");
+    fillUserSelectOptions(document.getElementById("rental-designated-admin-uid"), room.designatedRoomAdminUid || "");
+    document.getElementById("rental-start").value =
+      room.rentalStartAt   ? toInputDate(room.rentalStartAt.toDate())   : toInputDate(new Date());
+    document.getElementById("rental-end").value =
+      room.rentalExpiresAt ? toInputDate(room.rentalExpiresAt.toDate()) : toInputDate(new Date(Date.now() + 30*24*60*60*1000));
+    document.getElementById("clear-rental-btn").style.display = room.rentalExpiresAt ? "" : "none";
+    document.getElementById("rental-modal").classList.add("show");
+    updateRentalPreview();
+  };
+
+  window.closeRentalModal = () => {
+    document.getElementById("rental-modal").classList.remove("show");
+  };
+
+  window.updateRentalPreview = () => {
+    const endVal = document.getElementById("rental-end").value;
+    const preview = document.getElementById("rental-preview");
+    if (!endVal) { preview.style.display = "none"; return; }
+    const end  = new Date(endVal);
+    const diff = end - new Date();
+    if (diff > 0) {
+      preview.style.display = "block";
+      preview.textContent   = `⏱️ المدة المتبقية بعد الحفظ: ${formatDuration(diff)}`;
+    } else {
+      preview.style.display = "block";
+      preview.style.background = "#ffeaea";
+      preview.style.color = "#e53935";
+      preview.textContent = "⚠️ التاريخ المحدد قد انتهى بالفعل";
+    }
+  };
+
+  window.saveRental = async () => {
+    const id         = document.getElementById("rental-room-id").value;
+    const renterName = document.getElementById("rental-renter-name").value.trim();
+    const startVal   = document.getElementById("rental-start").value;
+    const endVal     = document.getElementById("rental-end").value;
+    const renterUid  = (document.getElementById("rental-renter-uid").value || "").trim() || null;
+    const dAdm       = (document.getElementById("rental-designated-admin-uid").value || "").trim() || null;
+    const dUser      = (window._users || []).find(u => u.id === dAdm);
+    if (!startVal || !endVal) { alert("يرجى تحديد تاريخ البداية والنهاية"); return; }
+    await updateDoc(doc(db, "rooms", id), {
+      renterName:      renterName || null,
+      renterUid:       renterUid,
+      designatedRoomAdminUid: dAdm || null,
+      designatedRoomAdminName: dUser ? (dUser.displayName || null) : null,
+      rentalStartAt:   Timestamp.fromDate(new Date(startVal)),
+      rentalExpiresAt: Timestamp.fromDate(new Date(endVal)),
+    });
+    closeRentalModal();
+    await loadRooms();
+  };
+
+  window.clearRental = async () => {
+    if (!confirm("هل تريد إلغاء الإيجار؟")) return;
+    const id = document.getElementById("rental-room-id").value;
+    await doClearRental(id);
+    closeRentalModal();
+  };
+
+  window.doClearRental = async (id) => {
+    await updateDoc(doc(db, "rooms", id), {
+      renterName: null, renterUid: null,
+      rentalStartAt: null, rentalExpiresAt: null,
+    });
+    await loadRooms();
+  };
+
+  // ── Users ──────────────────────────────────────────────────
+  function refreshAllUserDropdowns() {
+    [
+      "new-room-designated-admin",
+      "edit-room-designated-admin",
+      "rental-renter-uid",
+      "rental-designated-admin-uid",
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) fillUserSelectOptions(el, "");
+    });
+  }
+
+  window.loadUsers = async () => {
+    try {
+      const snap = await getDocs(collection(db, "users"));
+      window._users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderUsers(window._users);
+      renderOverview();
+      refreshAllUserDropdowns();
+    } catch (e) { console.error(e); }
+  };
+
+  window.searchUsers = (q) => {
+    const lq = q.toLowerCase();
+    const filtered = window._users.filter(u =>
+      (u.displayName || "").toLowerCase().includes(lq) ||
+      (u.email || "").toLowerCase().includes(lq)
+    );
+    renderUsers(filtered);
+  };
+
+  function renderUsers(users) {
+    if (!users.length) {
+      document.getElementById("users-table").innerHTML =
+        "<p style='text-align:center;color:#888;padding:20px'>لا توجد نتائج</p>";
+      return;
+    }
+    let html = `<table>
+      <tr><th>المستخدم</th><th>البريد</th><th>الحالة</th><th>إجراءات</th></tr>`;
+    users.slice(0, 50).forEach(u => {
+      const banned = u.isBanned
+        ? '<span class="badge" style="background:#ffeaea;color:#c62828">محظور</span>'
+        : '<span class="badge" style="background:#e8f5e9;color:#2e7d32">نشط</span>';
+      html += `<tr>
+        <td><b>${u.displayName || '—'}</b></td>
+        <td>${u.email || '—'}</td>
+        <td>${banned}</td>
+        <td>
+          ${u.isBanned
+            ? `<button class="btn btn-success" onclick="setBan('${u.id}',false)">✅ رفع الحظر</button>`
+            : `<button class="btn btn-danger" onclick="setBan('${u.id}',true)">🚫 حظر</button>`
+          }
+        </td>
+      </tr>`;
+    });
+    html += "</table>";
+    document.getElementById("users-table").innerHTML = html;
+  }
+
+  window.setBan = async (uid, ban) => {
+    if (!confirm(ban ? "هل تريد حظر هذا المستخدم؟" : "هل تريد رفع الحظر؟")) return;
+    await updateDoc(doc(db, "users", uid), {
+      isBanned: ban,
+      banReason: ban ? "حظر من لوحة تحكم المالك" : null,
+    });
+    await loadUsers();
+  };
+
+  // ── Support ────────────────────────────────────────────────
+  function loadSupport() {
+    const q = query(collection(db, "support_chat"), orderBy("lastMessageAt", "desc"));
+    onSnapshot(q, (snap) => {
+      const convos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      window._supportConvos = convos;
+      renderSupport(convos);
+    });
+  }
+  window.loadSupport = loadSupport;
+
+  function renderSupport(convos) {
+    if (!convos.length) {
+      document.getElementById("support-list").innerHTML =
+        "<p style='text-align:center;color:#888;padding:20px'>لا توجد رسائل دعم</p>";
+      return;
+    }
+    let html = "";
+    convos.forEach(c => {
+      const nm = escapeHtml(c.userName || c.displayName || 'مجهول');
+      const lm = escapeHtml(String(c.lastMessage || ''));
+      const tid = String(c.conversationThreadId || c.id || "");
+      const shortTid = tid.length > 10 ? "…" + tid.slice(-8) : tid;
+      html += `
+        <div style="padding:14px;border-bottom:1px solid #f0f0f0;cursor:pointer"
+             onclick="openConversation('${c.id}')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:50%;background:#fde8ee;display:flex;align-items:center;justify-content:center;font-size:18px">👤</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:14px">${nm}</div>
+              <div style="font-size:10px;color:#aaa">خيط خاص #${escapeHtml(shortTid)}</div>
+              <div style="font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px">
+                ${lm}
+              </div>
+            </div>
+            ${(c.unreadByAdmin || 0) > 0
+              ? `<span style="background:#BE5C7A;color:#fff;border-radius:12px;min-width:20px;height:20px;padding:0 6px;display:flex;align-items:center;justify-content:center;font-size:11px">${c.unreadByAdmin}</span>`
+              : ''}
+          </div>
+        </div>`;
+    });
+    document.getElementById("support-list").innerHTML = html;
+  }
+
+  window.openConversation = (convId) => {
+    const conv = window._supportConvos && window._supportConvos.find(x => x.id === convId);
+    const title = conv ? (conv.userName || conv.displayName || convId) : convId;
+    document.getElementById("support-conv-title").textContent = "محادثة: " + title;
+    document.getElementById("support-conv-modal").classList.add("show");
+    document.getElementById("support-reply-input").value = "";
+    window._activeConvId = convId;
+    const box = document.getElementById("support-messages");
+    box.innerHTML = "<div class='loading'><div class='spinner'></div></div>";
+    if (supportMessagesUnsub) { supportMessagesUnsub(); supportMessagesUnsub = null; }
+    const qMes = query(
+      collection(db, "support_chat", convId, "messages"),
+      orderBy("createdAt", "desc"),
+      limit(80)
+    );
+    supportMessagesUnsub = onSnapshot(qMes, (snap) => {
+      const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
+      box.innerHTML = rows.length ? rows.map(m => {
+        const adm = !!m.isFromAdmin;
+        const who = escapeHtml(m.senderName || (adm ? "الدعم" : "مستخدم"));
+        const tx = escapeHtml(String(m.text || ""));
+        const dt = m.createdAt?.toDate ? formatMsgTime(m.createdAt.toDate()) : "";
+        return `<div class="support-bubble ${adm ? "admin" : "user"}"><div class="who">${who} · ${dt}</div>${tx.replace(/\n/g,"<br>")}</div>`;
+      }).join("") : "<p style='color:#888;text-align:center'>لا رسائل بعد</p>";
+      box.scrollTop = box.scrollHeight;
+    }, (err) => { box.innerHTML = "<p style='color:#c62828'>تعذر تحميل الرسائل</p>"; console.error(err); });
+    updateDoc(doc(db, "support_chat", convId), { unreadByAdmin: 0 }).catch(() => {});
+  };
+
+  window.closeSupportConvModal = () => {
+    document.getElementById("support-conv-modal").classList.remove("show");
+    if (supportMessagesUnsub) { supportMessagesUnsub(); supportMessagesUnsub = null; }
+    window._activeConvId = null;
+  };
+
+  window.sendSupportReplyWeb = async () => {
+    const convId = window._activeConvId;
+    const txt = document.getElementById("support-reply-input").value.trim();
+    const u = auth.currentUser;
+    if (!convId || !txt || !u) return;
+    try {
+      await addDoc(collection(db, "support_chat", convId, "messages"), {
+        senderId: u.uid,
+        senderName: u.displayName || u.email || "الدعم",
+        senderPhoto: u.photoURL || null,
+        text: txt,
+        createdAt: serverTimestamp(),
+        isFromAdmin: true,
+      });
+      await updateDoc(doc(db, "support_chat", convId), {
+        lastMessage: txt,
+        lastMessageAt: serverTimestamp(),
+        unreadByAdmin: 0,
+      });
+      document.getElementById("support-reply-input").value = "";
+    } catch (e) {
+      alert("فشل الإرسال: " + e.message);
+    }
+  };
+
+  window.openCreateRoomModal = () => {
+    document.getElementById("new-room-title").value = "";
+    document.getElementById("new-room-desc").value = "";
+    document.getElementById("new-room-cat").value = "other";
+    document.getElementById("new-room-cap").value = "50";
+    document.getElementById("new-room-cover").value = "";
+    document.getElementById("new-room-cover-hint").textContent = "";
+    fillUserSelectOptions(document.getElementById("new-room-designated-admin"), "");
+    document.getElementById("create-room-modal").classList.add("show");
+  };
+  window.closeCreateRoomModal = () =>
+    document.getElementById("create-room-modal").classList.remove("show");
+
+  window.saveNewRoom = async () => {
+    const u = auth.currentUser;
+    if (!u) return;
+    const title = document.getElementById("new-room-title").value.trim();
+    if (title.length < 2) { alert("أدخل عنواناً للغرفة"); return; }
+    const desc = document.getElementById("new-room-desc").value.trim();
+    const cat = document.getElementById("new-room-cat").value;
+    const cap = parseInt(document.getElementById("new-room-cap").value, 10) || 50;
+    const icon = ICON_FOR_CAT[cat] || "💬";
+    const disp = u.displayName || u.email || "المالك";
+    const dSel = (document.getElementById("new-room-designated-admin").value || "").trim() || null;
+    const dUser = (window._users || []).find(x => x.id === dSel);
+    let coverImage = null;
+    const cf = document.getElementById("new-room-cover").files[0];
+    if (cf) {
+      try {
+        document.getElementById("new-room-cover-hint").textContent = "جارٍ رفع الصورة…";
+        coverImage = await uploadRoomCoverImage(cf);
+        document.getElementById("new-room-cover-hint").textContent = "تم رفع الصورة ✓";
+      } catch (e) {
+        alert("فشل رفع الصورة: " + (e.message || e));
+        return;
+      }
+    }
+    try {
+      await addDoc(collection(db, "rooms"), {
+        title, description: desc, category: cat, categoryIcon: icon,
+        coverImage: coverImage || null,
+        hostUid: u.uid, hostName: disp, hostPhoto: u.photoURL || null,
+        designatedRoomAdminUid: dSel || null,
+        designatedRoomAdminName: dUser ? (dUser.displayName || null) : null,
+        isLive: true, isPublic: true,
+        speakersCount: 1, listenersCount: 0,
+        speakers: [{
+          uid: u.uid, displayName: disp, photoURL: u.photoURL || null,
+          role: "master", isMuted: false, hasRaisedHand: false, permissions: [],
+       }],
+        settings: defaultRoomSettings(),
+        maxCapacity: cap,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      closeCreateRoomModal();
+      await loadRooms();
+    } catch (e) {
+      alert("خطأ: " + e.message);
+    }
+  };
+
+  function fillEditCatSelect(val) {
+    const sel = document.getElementById("edit-room-cat");
+    sel.innerHTML = ROOM_CAT_OPTIONS.map(([id, lbl]) =>
+      `<option value="${id}" ${id===val?"selected":""}>${lbl}</option>`
+    ).join("");
+  }
+
+  window.openEditRoomModal = (roomId) => {
+    const room = window._rooms.find(r => r.id === roomId);
+    if (!room) return;
+    document.getElementById("edit-room-id").value = roomId;
+    document.getElementById("edit-room-title").value = room.title || "";
+    document.getElementById("edit-room-desc").value = room.description || "";
+    document.getElementById("edit-room-cap").value = String(room.maxCapacity || 50);
+    fillEditCatSelect(room.category || "other");
+    document.getElementById("edit-room-cover").value = "";
+    const hint = document.getElementById("edit-room-cover-hint");
+    if (room.coverImage) {
+      hint.innerHTML = `معاينة الحالي: <a href="${escapeHtml(room.coverImage)}" target="_blank" rel="noopener">رابط</a>`;
+    } else {
+      hint.textContent = "لا توجد صورة للغلاف حالياً";
+    }
+    fillUserSelectOptions(document.getElementById("edit-room-designated-admin"), room.designatedRoomAdminUid || "");
+    document.getElementById("edit-room-modal").classList.add("show");
+  };
+  window.closeEditRoomModal = () =>
+    document.getElementById("edit-room-modal").classList.remove("show");
+
+  window.saveEditRoom = async () => {
+    const id = document.getElementById("edit-room-id").value;
+    if (!id) return;
+    const title = document.getElementById("edit-room-title").value.trim();
+    const desc = document.getElementById("edit-room-desc").value.trim();
+    const cat = document.getElementById("edit-room-cat").value;
+    const cap = parseInt(document.getElementById("edit-room-cap").value, 10) || 50;
+    const icon = ICON_FOR_CAT[cat] || "💬";
+    const dSel = (document.getElementById("edit-room-designated-admin").value || "").trim() || null;
+    const dUser = (window._users || []).find(x => x.id === dSel);
+    const ef = document.getElementById("edit-room-cover").files[0];
+    const updates = {
+      title, description: desc, category: cat, categoryIcon: icon,
+      maxCapacity: cap,
+      designatedRoomAdminUid: dSel || null,
+      designatedRoomAdminName: dUser ? (dUser.displayName || null) : null,
+      updatedAt: serverTimestamp(),
+    };
+    if (ef) {
+      try {
+        document.getElementById("edit-room-cover-hint").textContent = "جارٍ رفع الصورة…";
+        updates.coverImage = await uploadRoomCoverImage(ef);
+      } catch (e) {
+        alert("فشل رفع الصورة: " + (e.message || e));
+        return;
+      }
+    }
+    try {
+      await updateDoc(doc(db, "rooms", id), updates);
+      closeEditRoomModal();
+      await loadRooms();
+    } catch (e) {
+      alert("خطأ: " + e.message);
+    }
+  };
+
+  // ── Kill Switch ────────────────────────────────────────────
+  function loadKillSwitch() {
+    onSnapshot(doc(db, "app_status", "global_config"), (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const locked = data.isLocked || false;
+      const msg    = data.lockMessage || "";
+      document.getElementById("lock-toggle").className     = "toggle" + (locked ? " on" : "");
+      document.getElementById("kill-switch-card").className = "kill-switch-card" + (locked ? " locked" : "");
+      document.getElementById("lock-status-title").textContent =
+        locked ? "🔴 التطبيق محجوب الآن" : "🟢 التطبيق يعمل بشكل طبيعي";
+      if (!document.getElementById("lock-message").dataset.touched)
+        document.getElementById("lock-message").value = msg;
+    });
+  }
+
+  window.toggleLock = async () => {
+    const toggle  = document.getElementById("lock-toggle");
+    const isLocked = toggle.classList.contains("on");
+    if (!confirm(isLocked ? "هل تريد فتح التطبيق؟" : "هل تريد حجب التطبيق؟")) return;
+    await saveLock(!isLocked);
+  };
+
+  window.saveLockSettings = async () => {
+    const toggle  = document.getElementById("lock-toggle");
+    const isLocked = toggle.classList.contains("on");
+    await saveLock(isLocked);
+    alert("تم حفظ الإعدادات ✅");
+  };
+
+  async function saveLock(locked) {
+    const msg = document.getElementById("lock-message").value.trim()
+      || "التطبيق محجوب مؤقتاً للصيانة. سنعود قريباً.";
+    await updateDoc(doc(db, "app_status", "global_config"), {
+      isLocked: locked,
+      lockMessage: msg,
+      updatedAt: serverTimestamp(),
+    }).catch(() =>
+      // If doc doesn't exist, use set via a workaround
+      updateDoc(doc(db, "app_status", "global_config"), {
+        isLocked: locked, lockMessage: msg, updatedAt: serverTimestamp()
+      })
+    );
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
+  function escapeHtml(s) {
+    if (s == null) return "";
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function formatMsgTime(d) {
+    return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  }
+
+  function formatDuration(ms) {
+    if (ms <= 0) return "انتهى";
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    if (d > 0) return `${d}ي ${h%24}س ${m%60}د`;
+    if (h > 0) return `${h}س ${m%60}د ${s%60}ث`;
+    return `${m}د ${s%60}ث`;
+  }
+
+  function toDateStr(date) {
+    return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+  }
+
+  function toInputDate(date) {
+    const pad = n => String(n).padStart(2,'0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  // Update countdowns every second
+  setInterval(() => {
+    renderRentals();
+    renderExpiringSoon();
+  }, 1000);
+
+</script>
+
+<script>
+  // ── Navigation ────────────────────────────────────────────
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    // Load on demand
+    if (name === 'rooms')   window.loadRooms && window.loadRooms();
+    if (name === 'rentals') window.loadRooms && window.loadRooms();
+    if (name === 'users')   window.loadUsers && window.loadUsers();
+    if (name === 'support') window.loadSupport && window.loadSupport();
+  }
+
+  // Enter key on login
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.doLogin && window.doLogin();
+  });
+
+  // Mark lock message as user-touched
+  document.getElementById('lock-message')?.addEventListener('input', function() {
+    this.dataset.touched = '1';
+  });
+</script>
+
+</body>
+</html>

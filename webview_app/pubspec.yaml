@@ -1,0 +1,36 @@
+name: lqana_webview
+description: "لقانا - تطبيق الشات العربي (WebView)"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # WebView - لتشغيل index.html داخل التطبيق
+  webview_flutter: ^4.7.0
+  webview_flutter_android: ^3.16.0
+
+  # Firebase - إشعارات FCM
+  firebase_core: ^2.27.0
+  firebase_messaging: ^14.7.10
+
+  # Splash Screen
+  flutter_native_splash: ^2.4.1
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    # تضمين ملف الويب بالكامل كـ asset
+    - assets/web/

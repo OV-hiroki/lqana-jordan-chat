@@ -1,0 +1,107 @@
+rules_version = '2';
+
+// Jordan Audio Forum — انسخ إلى Firebase Console → Firestore → Rules → Publish
+// حدّث isAppAdmin() عند إضافة مشرفين (نفس القائمة في AppConstants.adminUids).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAppAdmin() {
+      return isSignedIn() && request.auth.uid == 'CdYNpTqftJd1INvAqli56y40OXk2';
+    }
+
+    function supportConvRef(convId) {
+      return /databases/$(database)/documents/support_chat/$(convId);
+    }
+
+    function iOwnSupportConv(convId) {
+      return isSignedIn() && (
+        convId == request.auth.uid ||
+        (
+          exists(supportConvRef(convId)) &&
+          get(supportConvRef(convId)).data.get('bindingAuthUid', '') == request.auth.uid
+        )
+      );
+    }
+
+    function iCanAccessSupportConv(convId) {
+      return isAppAdmin() || iOwnSupportConv(convId);
+    }
+
+    match /app_status/{docId} {
+      allow read: if true;
+      allow write: if isAppAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAppAdmin());
+      allow delete: if isAppAdmin();
+    }
+
+    match /rooms/{roomId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAppAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn()
+          && request.resource.data.senderId == request.auth.uid;
+        allow update, delete: if isAppAdmin();
+      }
+
+      match /bans/{banId} {
+        allow read: if isSignedIn();
+        allow create, delete: if isSignedIn();
+      }
+
+      match /logs/{logId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update: if isSignedIn();
+        allow delete: if isAppAdmin();
+      }
+
+      match /reports/{reportId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update, delete: if isAppAdmin();
+      }
+    }
+
+    match /support_chat/{convId} {
+      allow read: if iCanAccessSupportConv(convId);
+      allow create: if isSignedIn()
+        && request.resource.data.bindingAuthUid == request.auth.uid;
+      allow update: if iCanAccessSupportConv(convId);
+      allow delete: if isAppAdmin();
+
+      match /messages/{msgId} {
+        allow read: if iCanAccessSupportConv(convId);
+        allow create: if isSignedIn() && (
+          (
+            isAppAdmin() &&
+            request.resource.data.isFromAdmin == true &&
+            request.resource.data.senderId == request.auth.uid
+          ) ||
+          (
+            iCanAccessSupportConv(convId) &&
+            request.resource.data.isFromAdmin == false
+          )
+        );
+        allow update, delete: if isAppAdmin();
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
