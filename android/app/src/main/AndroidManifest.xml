@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- ─── صلاحيات ضرورية ─────────────────────────────────────────────── -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
@@ -11,19 +10,13 @@
         android:label="لقانا"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-
-        <!-- ✅ الأهم: تفعيل GPU Hardware Acceleration للـ WebView -->
         android:hardwareAccelerated="true">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-
-            <!-- ✅ Hardware acceleration على مستوى الـ Activity كمان -->
             android:hardwareAccelerated="true"
-
-            <!-- منع إعادة تحميل التطبيق لما الكيبورد يظهر أو الشاشة تتدور -->
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:windowSoftInputMode="adjustResize">
 
@@ -33,7 +26,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Firebase Messaging -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
