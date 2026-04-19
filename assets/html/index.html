@@ -75,10 +75,19 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.2); border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-track { background-color: transparent; }
 
-        .smooth-anim { will-change: transform, opacity; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); }
+        .smooth-anim { will-change: transform, opacity; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); transform: translateZ(0); }
 
         .btn-press { transition: transform 0.15s ease-out, opacity 0.15s ease-out; }
         .btn-press:active { transform: scale(0.95); opacity: 0.8; }
+
+        /* تقليل الأنيميشن تلقائياً لو الجهاز ضعيف أو battery saver شغال */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.1ms !important;
+            }
+        }
 
         .bg-main-gradient { background: linear-gradient(135deg, #7ED9C3 0%, #81D4FA 100%); }
         .bg-nav-gradient { background: linear-gradient(to right, #7ED9C3, #81D4FA); }
@@ -117,19 +126,19 @@
         /* 👑 --- صناديق القائمة الملكية (المربع كامل 3D) --- 👑 */
         .list-box-royal-gold { background: linear-gradient(145deg, #fffbee 0%, #fff0b3 50%, #ffe066 100%); border: 1px solid #ffd700 !important; box-shadow: 0 8px 15px rgba(218, 165, 32, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.8) !important; transform: perspective(500px) translateZ(5px); }
         .list-box-glass { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255, 255, 255, 0.8) !important; border-left: 1px solid rgba(255, 255, 255, 0.8) !important; border-right: 1px solid rgba(0, 0, 0, 0.05) !important; border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important; box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.1) !important; }
-        .list-box-galaxy { background: linear-gradient(270deg, #0f2027, #203a43, #2c5364); background-size: 400% 400%; animation: gradient-bg 5s ease infinite; border: 1px solid #00ffff !important; box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.8) !important; color: white !important; }
-        .list-box-blood { background: linear-gradient(145deg, #4a0000, #8b0000); border: 2px solid #ff0000 !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4), inset 0 0 10px rgba(255, 0, 0, 0.2) !important; animation: heartbeat-box 2s infinite; color: white !important; }
+        .list-box-galaxy { background: linear-gradient(270deg, #0f2027, #203a43, #2c5364); background-size: 400% 400%; animation: gradient-bg 15s ease infinite; border: 1px solid #00ffff !important; box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.8) !important; color: white !important; will-change: background-position; }
+        .list-box-blood { background: linear-gradient(145deg, #4a0000, #8b0000); border: 2px solid #ff0000 !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4), inset 0 0 10px rgba(255, 0, 0, 0.2) !important; animation: heartbeat-box 3s infinite; color: white !important; will-change: transform; }
         @keyframes gradient-bg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
         @keyframes heartbeat-box { 0% { transform: scale(1); } 15% { transform: scale(1.02); } 30% { transform: scale(1); } }
 
         /* 🖼️ --- إطارات الصور الشخصية المجسمة --- 🖼️ */
         .frame-gold-3d { border: 3px solid #d4af37 !important; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.5) !important; }
         .frame-diamond { border: 3px solid #b9f2ff !important; box-shadow: 0 0 15px #b9f2ff, inset 0 0 15px #ffffff !important; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); border-radius: 0 !important; }
-        .frame-hologram { border: 2px dashed #00ffff !important; animation: spin-hologram 8s linear infinite; box-shadow: 0 0 15px #00ffff, inset 0 0 15px #00ffff !important; }
+        .frame-hologram { border: 2px dashed #00ffff !important; animation: spin-hologram 8s linear infinite; box-shadow: 0 0 15px #00ffff, inset 0 0 15px #00ffff !important; will-change: transform; }
         .frame-cyberpunk { border: 2px solid #ff00ff !important; box-shadow: 2px 2px 0 #00ffff, -2px -2px 0 #ff00ff !important; clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%); border-radius: 0 !important; }
-        .frame-fire { border: 2px solid transparent !important; box-shadow: 0 0 0 2px #ff4500, 0 0 8px #ff4500, inset 0 0 8px #ff4500 !important; animation: pulse-fire 1.5s infinite; }
+        .frame-fire { border: 2px solid transparent !important; box-shadow: 0 0 0 2px #ff4500, 0 0 8px #ff4500, inset 0 0 8px #ff4500 !important; animation: pulse-fire 2.5s infinite; will-change: opacity; }
         @keyframes spin-hologram { 100% { transform: rotate(360deg); } }
-        @keyframes pulse-fire { 0% { box-shadow: 0 0 0 2px #ff4500, 0 0 4px #ff4500, inset 0 0 4px #ff4500; } 50% { box-shadow: 0 0 0 2px #ff8c00, 0 0 15px #ff8c00, inset 0 0 10px #ff8c00; } 100% { box-shadow: 0 0 0 2px #ff4500, 0 0 4px #ff4500, inset 0 0 4px #ff4500; } }
+        @keyframes pulse-fire { 0% { opacity: 0.85; } 50% { opacity: 1; } 100% { opacity: 0.85; } }
 
         /* ✨ --- نقوش الأسماء والتأثيرات الأسطورية --- ✨ */
         .anim-gold-glint { background-image: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer-gold 3s linear infinite; background-size: 200% auto; font-weight: 900 !important; }
@@ -137,7 +146,7 @@
         .anim-fire-text { background-image: linear-gradient(0deg, #ff0000 0%, #ff8000 50%, #ffff00 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: fire-flicker 1s infinite alternate; }
 
         /* 🔥 الحركات الأسطورية المفقودة التي أضفناها الآن 🔥 */
-        .anim-matrix { color: #22c55e !important; text-shadow: 0 0 5px #22c55e, 0 0 10px #166534; animation: matrix-glitch 0.2s infinite; font-family: monospace; letter-spacing: 1px; }
+        .anim-matrix { color: #22c55e !important; text-shadow: 0 0 5px #22c55e, 0 0 10px #166534; animation: matrix-glitch 1.5s infinite; font-family: monospace; letter-spacing: 1px; }
         .anim-magma { background-image: linear-gradient(to top, #7f1d1d, #ef4444, #f59e0b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: magma-flow 2s ease-in-out infinite alternate; filter: drop-shadow(0 2px 2px rgba(239,68,68,0.5)); }
         .anim-diamond-sparkle { background-image: linear-gradient(45deg, #ffffff 25%, #a5f3fc 50%, #ffffff 75%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer-gold 1.5s linear infinite; filter: drop-shadow(0 0 2px #67e8f9); }
         .anim-holo-split { position: relative; display: inline-block; color: transparent !important; }
@@ -147,11 +156,11 @@
 
         @keyframes shimmer-gold { to { background-position: 200% center; } }
         @keyframes glitch { 0% { transform: translate(0); } 5% { transform: translate(-2px, 2px); } 10% { transform: translate(2px, -2px); } 15% { transform: translate(0); } 100% { transform: translate(0); } }
-        @keyframes fire-flicker { 0% { opacity: 0.8; filter: drop-shadow(0 0 2px #ff4500); } 100% { opacity: 1; filter: drop-shadow(0 0 8px #ff8c00); } }
+        @keyframes fire-flicker { 0% { opacity: 0.85; } 100% { opacity: 1; } }
         @keyframes matrix-glitch { 0% { opacity: 1; } 50% { opacity: 0.8; transform: skewX(-5deg); } 100% { opacity: 1; } }
-        @keyframes magma-flow { 0% { filter: hue-rotate(0deg) drop-shadow(0 2px 2px rgba(239,68,68,0.8)); } 100% { filter: hue-rotate(-20deg) drop-shadow(0 4px 8px rgba(245,158,11,0.9)); } }
-        @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 20% { clip-path: inset(60% 0 10% 0); } 40% { clip-path: inset(40% 0 50% 0); } 60% { clip-path: inset(80% 0 5% 0); } 80% { clip-path: inset(10% 0 70% 0); } 100% { clip-path: inset(30% 0 20% 0); } }
-        @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); } 20% { clip-path: inset(80% 0 5% 0); } 40% { clip-path: inset(30% 0 20% 0); } 60% { clip-path: inset(70% 0 10% 0); } 80% { clip-path: inset(20% 0 50% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
+        @keyframes magma-flow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(-20deg); } }
+        @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 33% { clip-path: inset(60% 0 10% 0); } 66% { clip-path: inset(40% 0 50% 0); } 100% { clip-path: inset(30% 0 20% 0); } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); } 33% { clip-path: inset(80% 0 5% 0); } 66% { clip-path: inset(30% 0 20% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
         /* للحفاظ على الألوان مع الحركات العادية */
         .anim-shine { background-image: linear-gradient(to right, var(--name-color, currentColor) 20%, #ffffff 50%, var(--name-color, currentColor) 80%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shine 2.5s linear infinite; }
@@ -432,17 +441,24 @@
     };
 
     const uploadImageExternal = async (file) => {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                try {
-                    const base64Data = reader.result.split(',')[1];
-                    const formData = new FormData();
-                    formData.append('image', base64Data);
-                    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData })
-                    .then(res => {
-                        if (!res.ok) throw new Error('Upload failed');
+        try {
+            const base64Data = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = () => reject(new Error('FileReader failed'));
+            });
+            const formData = new FormData();
+            formData.append('image', base64Data);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+            if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+            const data = await res.json();
+            return data?.data?.url || null;
+        } catch (err) {
+            console.error('uploadImageExternal error:', err);
+            return null;
+        }
+    };
 
     const TRANSLATIONS = {
         ar: {
@@ -471,27 +487,36 @@
 
     const TERMS_TEXT = `شروط استخدام برنامج لقانا الأردن شات:\n1. يمنع منعاً باتاً التحدث بالكلام البذيء أو الشتم أو الإساءة لأي عضو.\n2. يمنع الخوض في النقاشات السياسية أو المذهبية أو الطائفية.\n3. يمنع الإساءة للذات الإلهية أو الأديان السماوية أو الرموز الدينية.\n4. يمنع نشر الإعلانات أو الروابط الخارجية داخل الغرف العامة.\n5. يمنع الدخول بأسماء غير لائقة أو أسماء وهمية لغرض الإزعاج.\n6. يمنع تكرار الدخول لرفع عدد المتواجدين (التفريك).\n7. الإدارة لها الحق في حظر أي مستخدم يخالف هذه القوانين دون سابق إنذار.`;
 
-    // 👈 تعديل دالة طلب الصلاحيات لتشمل المايك والكاميرا معاً بذكاء
+    // طلب صلاحية المايك — محسّن للمتصفح و Flutter WebView
     window.requestMicPermissionEarly = async () => {
+        // لو الـ mediaDevices مش موجود (HTTP أو WebView قديم)
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.warn("navigator.mediaDevices غير متاح — تأكد من HTTPS أو localhost");
+            return false;
+        }
         try {
-            // نطلب صلاحية المايك والكاميرا مع بعض في نفس الإشعار
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            // نسكرهم فوراً عشان ما يضلوا شغالين بالخلفية أو يضووا الكاميرا
+            // نطلب الصوت فقط — طلب الكاميرا بيزيد احتمال الرفض بدون سبب
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+            });
             stream.getTracks().forEach(track => track.stop());
-            console.log("تم أخذ صلاحية المايك والكاميرا معاً بنجاح ✅");
+            console.log("✅ صلاحية المايك تمت بنجاح");
             return true;
         } catch (err) {
-            console.warn("فشل الحصول على المايك والكاميرا معاً، سنحاول للمايك فقط ⚠️", err);
-            try {
-                // خطة بديلة: لو جهازه ما فيه كاميرا (مثلاً كمبيوتر مكتبي)، نطلب المايك بس عشان ما نعطله
-                const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioStream.getTracks().forEach(track => track.stop());
-                console.log("تم أخذ صلاحية المايك فقط بنجاح ✅");
-                return true;
-            } catch (audioErr) {
-                console.warn("المستخدم رفض الصلاحية كلياً ❌", audioErr);
-                return false;
+            const errName = err?.name || '';
+            if (errName === 'NotAllowedError' || errName === 'PermissionDeniedError') {
+                // في WebView: اعرض رسالة توجيه للمستخدم
+                console.warn("❌ المستخدم رفض صلاحية المايك:", err.message);
+                // نحاول نرسل إشعار للـ Flutter WebView إذا كان موجود
+                if (window.flutter_inappwebview) {
+                    window.flutter_inappwebview.callHandler('micPermissionDenied').catch(() => {});
+                }
+            } else if (errName === 'NotFoundError' || errName === 'DevicesNotFoundError') {
+                console.warn("⚠️ لا يوجد مايك في هذا الجهاز");
+            } else {
+                console.warn("⚠️ خطأ في المايك:", err.name, err.message);
             }
+            return false;
         }
     };
 
