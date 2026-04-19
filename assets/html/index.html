@@ -436,30 +436,13 @@
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                const base64Data = reader.result.split(',')[1];
-                const formData = new FormData();
-                formData.append('image', base64Data);
-                fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) resolve(data.data.url);
-                    else resolve(null);
-                }).catch(err => {
-                    console.error(err); resolve(null);
-                });
-            };
-            reader.onerror = () => resolve(null);
-        });
-    };
-
-    const STATUS_OPTIONS = [
-        { id: 'available', label: 'متاح', icon: '🟢', color: 'text-green-500' },
-        { id: 'away', label: 'بالخارج', icon: '🟡', color: 'text-yellow-500' },
-        { id: 'busy', label: 'مشغول', icon: '🔴', color: 'text-red-500' },
-        { id: 'phone', label: 'هاتف', icon: '📱', color: 'text-blue-500' },
-        { id: 'eating', label: 'طعام', icon: '🍔', color: 'text-orange-500' },
-        { id: 'driving', label: 'سيارة', icon: '🚗', color: 'text-blue-400' }
-    ];
+                try {
+                    const base64Data = reader.result.split(',')[1];
+                    const formData = new FormData();
+                    formData.append('image', base64Data);
+                    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Upload failed');
 
     const TRANSLATIONS = {
         ar: {
@@ -5191,7 +5174,7 @@
                 ) : (
                     <>
                         {/* 👈 ربط لون الشريط العلوي */}
-                        <header className="p-2 flex justify-between items-center shadow-sm border-b-2 border-theme-primary relative z-20 h-14" style={{ backgroundColor: appColors.topBar }}>
+                        <header className="p-2 flex justify-between items-center shadow-sm border-b-2 border-theme-primary relative z-10 h-12" style={{ backgroundColor: appColors.topBar }}>
                             <div className="relative">
                                 <button onClick={() => setShowMainMenu(!showMainMenu)} className="p-1 border-2 border-[#81D4FA] rounded-md text-theme-dark bg-white active:scale-90 transition-transform relative z-[9001]">
                                     <Menu size={22} className="stroke-current stroke-[2.5]" />
